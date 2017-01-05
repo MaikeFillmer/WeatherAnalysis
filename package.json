@@ -1,0 +1,27 @@
+{
+  "name": "kargochallenge",
+  "version": "1.0.0",
+  "description": "This App retrieves the last 11 years of weather data for San Francisco, CA and calculates and displays the mean and max temperature per year as well as the average of the top ten hottest days per year.",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "method-override": "^2.3.7",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaikeFillmer/WeatherAnalysis.git"
+  },
+  "author": "Maike Fillmer",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MaikeFillmer/WeatherAnalysis/issues"
+  },
+  "homepage": "https://github.com/MaikeFillmer/WeatherAnalysis#readme"
+}
