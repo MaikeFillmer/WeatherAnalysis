@@ -22,12 +22,12 @@ Clone the Repo to download the code!
 Important Changes to Make:
 
 * In the weatherAnalysis.R code, change the library directory (wherever you want to install R packages) and working directory (wherever the repo is) to the relevant locations on your computer. There are 5 lines that need to be changed:
-![](/public/Directory1.PNG)
-![](/public/Directory2.PNG)
-![](/public/Directory3.PNG)
-![](/public/Directory4.PNG)
+![](/public/assets/images/Directory1.PNG)
+![](/public/assets/images/Directory2.PNG)
+![](/public/assets/images/Directory3.PNG)
+![](/public/assets/images/Directory4.PNG)
 * In the javascript AJAX call to the api, make sure to plug in your own API key
-![](/public/APIKey.PNG)
+![](/public/assets/images/APIKey.PNG)
 
 Install the dependencies and start the server.
 
