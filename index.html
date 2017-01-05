@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Weather Analysis</title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+	<div class="container text-center">
+		<div class="jumbotron">
+			<h1>Weather Data Analysis</h1> 
+			<p>Analysing weather data for San Franciso, CA between 2006 and 2016. The main target is to determine if a discernable trend in temperatures can be found. The average of the top ten hottest days of every year is calculated and charted below.</p> 
+		</div> 
+	
+		<div class="panel panel-info">
+			<div class="panel-heading">Retrieve and Display Data!</div>
+			<div class="panel-body">
+				<button type="button" class="btn btn-default" id="getData">Get and Display Data</button>
+			</div>
+		</div>
+
+		<div class="panel panel-success" >
+			<div class="panel-heading">Is San Francisco Getting Hotter?</div>
+			<div class="panel-body " >	
+				<div id="loading-image1">
+					<!-- <img src="ajax-loader.gif" alt="Loading Icon"> -->
+					<br>
+					Over 12,000 pieces of information are being retrieved - This may take a minute.
+				</div>
+				<div id="loading-image2">
+					<!-- <img src="ajax-loader.gif" alt="Loading Icon"> -->
+					<br>
+					Analysing and Displaying the data!
+				</div>
+				<div id="instructions">
+					Get and Display Data to see information display here!
+				</div>	
+				<div id="myDiv" style="width: 100%; height: 500px;" align="center"><!-- Plotly chart will be drawn inside this DIV --></div>
+				<div id="myDiv2" style="width: 100%; height: 500px;" align="center"><!-- Plotly chart will be drawn inside this DIV --></div>
+				
+				
+			</div>
+		</div>
+		
+	</div>
+	
+	
+	<script>
+	
+	/**************************************************************/
+	/* EXTRACTING AND ANALYSING THE LAST TEN YEARS OF INFORMATION */
+	/**************************************************************/
+
+	/* Hide the Loading Messages */
+	$('#loading-image1').hide();
+	$('#loading-image2').hide();
+
+	/* Click Listener on Button */
+	$("#getData").click(function() {
+		
+		/* Set Starting Variables*/
+		var csv = "Date,Temp,Humidity,Pressure\n"  //headers for csv string
+		var startDate = moment("1/1/2006", "MM-DD-YYYY").format("YYYYMMDD");  //set start date 
+		var numberOfDays = moment(startDate).diff(moment("1/1/2017", "MM-DD-YYYY"),'days')*-1  //calculate days between start date and 1/1/17. Due to ordering of dates, this will return a negative value, so it needs to be multiplied by -1. For code cleanliness, change order and remove -1.
+		var counter = 0; //This counter ensures all AJAX calls are complete before continuing.
+
+		/* Function to Extract Information from API */
+		function extractDailyWeatherData(callback) {
+			/* Show Loading Message */
+			$('#loading-image1').show();
+			$('#instructions').hide();
+
+			for(i=0; i<numberOfDays; i++){			
+				(function(i){
+					jQuery(document).ready(function($) {
+						$.ajax({
+							url : "http://api.wunderground.com/api/*** YOUR KEY HERE ***/history_" + startDate + "/q/CA/San_Francisco.json", 
+							dataType : "jsonp",
+							success : function(parsed_json) {
+
+								/* Retrieving relevant information from JSON response from Weather Underground API */
+								var date = parsed_json['history']['date']['mon'] + "/" + parsed_json['history']['date']['mday'] + "/" + parsed_json['history']['date']['year'];
+								var temp = parsed_json['history']['dailysummary']['0']['meantempi'];
+								var pressure = parsed_json['history']['dailysummary']['0']['meanpressurei'];
+								var humidity = parsed_json['history']['observations']['6']['hum'];
+
+								/* Add Retrieved Info to csv String */
+								csv += date + "," + temp + "," + humidity + "," + pressure + "\n"
+
+								counter++;
+
+								/* Once all AJAX calls are completed, the callback function is invoked. */
+								if(counter == numberOfDays){ 
+									$('#loading-image1').hide(); //Since all AJAX calls are complete, hide the loading image.
+									callback();
+								}
+							}				  
+						});
+						startDate = moment(startDate).add(1, 'day').format("YYYYMMDD"); //incrementing the start date						
+					});
+				})(i); //using closure to make sure that there is one ajax call per i value
+			}
+		}
+
+		/* Invoking extracting Weather Data Function */
+		extractDailyWeatherData(function(){  //the following is the callback function. 
+
+			/* Post the csv string to the server to save it as a csv file */
+			$.post("/sendData", csv)
+
+			/* Show the next loading image */
+			$('#loading-image2').show();
+
+	  		/* Analyse the Weather Data with a get request to the server */
+			$.get('/fetchROutput', function(data) {
+
+				/* Now that the Analysis is complete, hide the loading screen */
+				$('#loading-image2').hide();
+
+				/********** Top Ten Hottest Days Plot **********/
+
+				/* Retrieve and Calculate Coordinates for trendline */
+				var slope = data[1][0];
+				var intercept = data[1][1];
+				var y1 = slope * 2006 + intercept;
+				var y2 = slope * 2016 + intercept;
+
+				/**** Plotting the Data *****/
+
+				/* Set up the plotting Variables */
+				var trace1 = {
+				  x: data[0]["Group.1"],
+				  y: data[0].x,
+				  mode: 'markers',
+				  name: 'Mean of Top Ten Temperatures'
+				};
+				var trace2 = {
+				  x: [2006,2016],
+				  y: [y1, y2],
+				  mode: 'lines',
+				  name: 'Linear Trend Line'
+				};
+
+				var plotData = [ trace1, trace2 ];
+
+				var layout = {
+					autosize: false,
+					width: 680,
+					height: 500,
+					title:'Average of Ten Hottest Days Over 11 Years',
+					legend: {"orientation": "h"}
+				};
+
+				/* Generate the Plot */
+				Plotly.newPlot('myDiv', plotData, layout);
+
+				/********** Mean and Max Temperature Per Year Plot **********/
+
+				/**** Plotting the Data *****/
+
+				/* Set up the plotting Variables */
+				var trace1 = {
+				  x: data[2]["Group.1"],
+				  y: data[2].x,
+				  mode: 'markers',
+				  name: 'Mean Yearly Temperature'
+				};
+
+				var trace2 = {
+				  x: data[3]["Group.1"],
+				  y: data[3].x,
+				  mode: 'markers',
+				  name: 'Max Yearly Temperature'
+				};
+
+				var plotData = [ trace1, trace2 ];
+
+				var layout = {
+					autosize: false,
+					width: 680,
+					height: 500,
+					title:'Average and Max Temperature Over the Last 11 Years',
+					legend: {"orientation": "h"}
+				};
+
+				/* Generate the Plot */
+				Plotly.newPlot('myDiv2', plotData, layout);
+			})
+		}); 
+	});
+
+	</script>
+	
+</body>
+</html>
+
+
