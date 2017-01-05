@@ -50,7 +50,8 @@ There are a few protocols used in order to request data from the Weather Undergr
 
 ### Analysing More Data
 If you want to request data from many more locations, time will be a major constraint. Getting 11 years of information for just one location already takes a long time. The data is also not clean, meaning it would take that much longer to clean the data and make sure it is ready for analysis. Storage of the data may become a problem and the time it would take to analyse the data. 
-Ocean data would be handled separately from the city data. There would be seperate means, maxs, mins, trends etc.
+
+This program was written generally, meaning that this program could also be used to analyse ocean data, mountain data, any data etc. The analysis would stay the same, the retrieval of the data would change and you would need to be sure that the data is cleaned and in the same format as expected by the R code.
 
 ### Future Improvements
 
@@ -60,6 +61,7 @@ Ocean data would be handled separately from the city data. There would be sepera
 - Incorporate an auto-reset sequence, so that the code can be run multiple times safely. 
 - Include more of the results calculated in R - pressure, humidity
 - Use MVC. Better separation of code into modular files (separate JS files, controller file for routes, etc)
+- Reconsider the Tech Setup, the use of NodeJS with R may not be the most efficient way to analyse the data. Even if it is efficient, I may not have used the best method to communicate between the two.
 
 
 ![N|Solid](https://www.wunderground.com/logos/images/wundergroundLogo_4c.jpg)
