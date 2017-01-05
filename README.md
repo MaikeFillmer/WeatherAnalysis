@@ -27,6 +27,7 @@ Important Changes to Make:
 ![](/public/Directory3.PNG)
 ![](/public/Directory4.PNG)
 * In the javascript AJAX call to the api, make sure to plug in your own API key
+![](/public/APIKey.PNG)
 
 Install the dependencies and start the server.
 
