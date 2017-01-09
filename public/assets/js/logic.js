@@ -56,7 +56,7 @@
 						});
 						startDate = moment(startDate).add(1, 'day').format("YYYYMMDD"); //incrementing the start date						
 					});
-				})(i); //using closure to make sure that there is one ajax call per i value
+				})(i); //using closure and an immediately invoking function expression to make sure that there is one ajax call per i value
 			}
 		}
 
@@ -89,6 +89,26 @@
 				/* Now that the Analysis is complete, hide the loading screen and show the explanation */
 				$('#loading-image2').hide();
 				$('#explanation').show();
+
+				/********** All Data Plot **********/			
+
+				/**** Plotting the Data *****/
+
+				/* Set up the plotting Variables */
+				var trace5 = new trace(data[4],data[5],'markers', 'All Temperatures')
+								
+				var plotData = [ trace5 ];
+
+				var layout = {
+					autosize: false,
+					width: 800,
+					height: 500,
+					title:'11 Years of Temperatures',
+					legend: {"orientation": "h"}
+				};
+
+				/* Generate the Plot */
+				Plotly.newPlot('myDiv0', plotData, layout);
 
 				/********** Top Ten Hottest Days Plot **********/
 				calculateTrendlineCoordinates(data);			

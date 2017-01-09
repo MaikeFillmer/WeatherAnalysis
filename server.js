@@ -74,7 +74,13 @@ app.get('/fetchROutput', function(req,res) {
 		var maxTempOutput = fs.readFileSync("rMaxTempOutput.json");
 		var jsonMaxTempOutput = JSON.parse(maxTempOutput);
 
-		var jsonAllData = [jsonGraphContent, jsonGraphStatsOutput, jsonMeanTempOutput, jsonMaxTempOutput];
+		var allTempOutputDates = fs.readFileSync("rallTempOutputDates.json");
+		var jsonAllTempOutputDates = JSON.parse(allTempOutputDates);
+
+		var allTempOutputData = fs.readFileSync("rallTempOutputData.json");
+		var jsonAllTempOutputData = JSON.parse(allTempOutputData);
+
+		var jsonAllData = [jsonGraphContent, jsonGraphStatsOutput, jsonMeanTempOutput, jsonMaxTempOutput, jsonAllTempOutputDates, jsonAllTempOutputData];
 
 		
 		res.send(jsonAllData)

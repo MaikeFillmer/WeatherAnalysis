@@ -66,3 +66,9 @@ write(meanTempOutput, "rMeanTempOutput.json")
 ## Max Temperatures ##
 maxTempOutput <- toJSON(maxPerYearTemperature)
 write(maxTempOutput, "rMaxTempOutput.json")
+
+## All Temperatures ##
+allTempOutputDates <- toJSON(weatherData$Date)
+allTempOutputData <- toJSON(weatherData$Temp)
+write(allTempOutputDates, "rAllTempOutputDates.json")
+write(allTempOutputData, "rAllTempOutputData.json")
